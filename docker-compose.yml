@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: apartments-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apartments
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./beckend
+    container_name: apartments-backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: apartments
+      ALLOWED_ORIGINS: '["http://localhost:3000", "http://localhost:8000"]'
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./beckend:/app
+      - /app/__pycache__
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: apartments-frontend
+    command: npm run dev
+    environment:
+      NEXT_PUBLIC_API_URL: ""
+      NEXT_PUBLIC_API_V1_STR: "/api"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app         
+      - /app/node_modules       
+      - /app/.next              
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
