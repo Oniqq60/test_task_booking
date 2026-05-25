@@ -30,3 +30,34 @@ curl http://localhost:8000/health
 Frontend: http://localhost:3000
 Backend API: http://localhost:8000
 Swagger Docs: http://localhost:8000/docs
+
+```bash
+GET http://localhost:8000/api/v1/apartments
+POST http://localhost:8000/api/v1/apartments
+title - Text - Тестовая квартира
+address - Text - г. Москва, ул. Тестовая, 1
+price_per_day - Text - 5000
+owner_phone - Text - +79991234567
+files - File - .jpg/.png
+
+GET http://localhost:8000/api/v1/apartments/{{apartment_id}}
+GET http://localhost:8000/api/v1/apartments/{{apartment_id}}/booked-periods
+```
+
+```bash
+POST http://localhost:8000/api/v1/bookings
+{
+  "apartment_id": "{{apartment_id}}",
+  "guest_name": "Артём Иванов",
+  "guest_phone": "+79991112233",
+  "check_in": "2026-06-10",
+  "check_out": "2026-06-15"
+}
+
+GET http://localhost:8000/api/v1/bookings
+GET http://localhost:8000/api/v1/bookings/{{booking_id}}
+```
+
+```bash
+GET http://localhost:8000/api/v1/photos/{{photo_id}}
+```
